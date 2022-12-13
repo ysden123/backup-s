@@ -2,14 +2,11 @@
  * Copyright (c) 2022. StulSoft
  */
 plugins {
-    // Apply the scala Plugin to add support for Scala.
     scala
-
-    // Apply the application plugin to add support for building a CLI application in Java.
     application
 }
 
-version = "2.0.0"
+version = "2.0.1"
 
 repositories {
     mavenCentral()
@@ -20,25 +17,9 @@ dependencies {
     implementation("com.typesafe:config:1.4.2")
     implementation("commons-io:commons-io:2.11.0")
     implementation("org.apache.commons:commons-lang3:3.12.0")
-}
 
-testing {
-    suites {
-        // Configure the built-in test suite
-        val test by getting(JvmTestSuite::class) {
-            // Use JUnit4 test framework
-            useJUnit("4.13.2")
-
-            dependencies {
-                // Use Scalatest for testing our library
-                implementation("org.scalatest:scalatest_2.13:3.2.13")
-                implementation("org.scalatestplus:junit-4-13_2.13:3.2.2.0")
-
-                // Need scala-xml at test runtime
-                runtimeOnly("org.scala-lang.modules:scala-xml_2.13:1.2.0")
-            }
-        }
-    }
+    testImplementation("org.scalatest:scalatest_2.13:3.3.0-SNAP3")
+    testImplementation("org.scalatestplus:junit-4-12_2.13:3.3.0.0-SNAP2")
 }
 
 java {
