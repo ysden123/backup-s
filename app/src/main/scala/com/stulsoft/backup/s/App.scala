@@ -6,13 +6,16 @@ package com.stulsoft.backup.s
 
 import com.stulsoft.backup.s.config.AppConfig
 
-import scala.jdk.CollectionConverters.CollectionHasAsScala
-
 object App {
   def main(args: Array[String]): Unit = {
-    val appConfig = AppConfig.getAppConfig
-    val sss = appConfig.getDirectories.asScala.toSet
-    val copyDirectories = CopyDirectories(sss)
+    val release = System.getProperty("release") != null
+    if (release){
+      System.getProperties.put("config.file",s"${System.getenv("APPDATA")}\\backup-s\\application.conf")
+    }
+    val configFilePath = System.getProperty("config.file")
+    println(s"Getting configuration from $configFilePath")
+    val appConfig = AppConfig.build()
+    val copyDirectories = CopyDirectories(appConfig.directories)
     copyDirectories.makeCopy()
   }
 }

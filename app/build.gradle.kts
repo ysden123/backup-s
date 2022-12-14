@@ -6,7 +6,7 @@ plugins {
     application
 }
 
-version = "2.0.1"
+version = "2.1.0"
 
 repositories {
     mavenCentral()
@@ -29,7 +29,7 @@ java {
 
 application {
     mainClass.set("com.stulsoft.backup.s.App")
-    applicationDefaultJvmArgs = listOf("-Dconfig.file=application.conf")
+    applicationDefaultJvmArgs = listOf("-Drelease=true")
 }
 
 tasks.named("startScripts"){

@@ -11,14 +11,14 @@ import org.scalatestplus.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class AppConfigSuite extends AnyFunSuite {
   test("AppConfig should return AppConfig") {
-    val appConfig = AppConfig.getAppConfig
+    val appConfig = AppConfig.build()
     assert(appConfig != null)
-    val directories = appConfig.getDirectories
-    assert(!directories.isEmpty)
-    val firstDirectory = directories.get(0)
-    assert(firstDirectory.getName.equals("backup-s"))
-    val secondDirectory = directories.get(1)
+    val directories = appConfig.directories
+    assert(directories.nonEmpty)
+    val firstDirectory = directories.head
+    assert(firstDirectory.name == "backup-s")
+    val secondDirectory = directories.last
     assert(secondDirectory != null)
-    assert(secondDirectory.getDirectoriesToSkip == null)
+    assert(secondDirectory.directoriesToSkip.isEmpty)
   }
 }

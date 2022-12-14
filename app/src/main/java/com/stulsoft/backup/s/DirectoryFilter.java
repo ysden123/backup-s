@@ -8,11 +8,10 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class DirectoryFilter implements FileFilter {
     private static final int showInfoStep = 100;
@@ -23,12 +22,11 @@ public class DirectoryFilter implements FileFilter {
 
     private final AtomicInteger showInfoCounter = new AtomicInteger(0);
 
-    public DirectoryFilter(Collection<String> skipFolders) {
-        if (skipFolders == null) {
-            this.skipFolders = Collections.emptySet();
-        } else {
-            this.skipFolders = new HashSet<>(skipFolders.stream().map(FilenameUtils::separatorsToSystem).toList());
-        }
+    public DirectoryFilter(Set<String> skipFolders) {
+        this.skipFolders = new HashSet<>(skipFolders
+                .stream()
+                .map(FilenameUtils::separatorsToSystem)
+                .collect(Collectors.toSet()));
     }
 
     public int getHandledDirectories() {
