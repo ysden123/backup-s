@@ -4,28 +4,47 @@
 
 package com.stulsoft.backup.s.config
 
-import com.typesafe.config.ConfigFactory
+import org.json4s._
+import org.json4s.jackson.JsonMethods._
 
-import scala.jdk.CollectionConverters._
+import java.io.FileNotFoundException
+import java.nio.file.NoSuchFileException
+import scala.io.Source
+import scala.util.{Failure, Success, Using}
 
 case class AppConfig(directories: Set[Directory])
 
 object AppConfig {
   def build(): AppConfig = {
-    val appConfigRow = ConfigFactory.load()
-    val directoriesRow = appConfigRow.getConfigList("directories").asScala
-    val directories = directoriesRow.map(config => {
-      val name = config.getString("name")
-      val source = config.getString("source")
-      val destination = config.getString("destination")
-      val maxBackupDirectories = config.getInt("maxBackupDirectories")
-      val directoriesToSkip = if (config.hasPath("directoriesToSkip")) {
-        Some(config.getStringList("directoriesToSkip").asScala.toSet)
-      } else {
-        None
-      }
-      Directory(name, source, destination, maxBackupDirectories, directoriesToSkip)
-    }).toSet
-    AppConfig(directories)
+    implicit val formats: DefaultFormats = DefaultFormats
+    try {
+      val jsonObject: JValue =
+        if (System.getProperty("release") == null) {
+          println("Getting configuration from the resource")
+          parse(Source.fromResource("configuration.json").getLines().mkString)
+        } else {
+          val configPath = s"${System.getenv("APPDATA")}\\backup-s\\configuration.json"
+          println(s"Getting configuration from $configPath")
+          Using(Source.fromFile(configPath)) {
+            source => parse(source.getLines().mkString)
+          } match {
+            case Success(jValue) => jValue
+            case Failure(exception) => exception match {
+              case _ @ (_: NoSuchFileException | _: FileNotFoundException) =>
+                println(s"Cannot find $configPath")
+                JArray(Nil)
+              case x =>
+                x.printStackTrace()
+                JArray(Nil)
+            }
+          }
+        }
+      val directories: Set[Directory] = jsonObject.children.map(directory => directory.extract[Directory]).toSet
+      AppConfig(directories)
+    } catch {
+      case e: Exception =>
+        println(s"sError: ${e.getMessage}")
+        AppConfig(Set())
+    }
   }
 }
